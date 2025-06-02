@@ -180,9 +180,9 @@ app.post('/api/feedback', async (req, res) => {
   }
 });
 
-// Download Certificate
 app.get('/api/download-certificate/:filename', (req, res) => {
   const filePath = path.join(__dirname, 'certificates', req.params.filename);
+  console.log('👉 Checking file path:', filePath); // 👈 Add this line
 
   if (!fs.existsSync(filePath)) {
     console.error('❌ Certificate not found:', filePath);
@@ -196,7 +196,6 @@ app.get('/api/download-certificate/:filename', (req, res) => {
     }
   });
 });
-
 
 app.get('/api/bar-chart-data', async (req, res) => {
   try {
