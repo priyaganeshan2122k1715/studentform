@@ -3,15 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-
 const app = express();
 const PORT = 2000;
-
-
 app.use(cors());
 app.use(express.json());
-
-
 mongoose.connect('mongodb://localhost:27017/studentDB', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -19,8 +14,6 @@ mongoose.connect('mongodb://localhost:27017/studentDB', {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('✅ MongoDB connected'));
-
-
 const studentSchema = new mongoose.Schema({
   username: String,
   email: String,
@@ -49,8 +42,6 @@ const studentSchema = new mongoose.Schema({
   admissionYear: Number,
 });
 const Student = mongoose.model('Student', studentSchema);
-
-
 const feedbackSchema = new mongoose.Schema({
   studentId: String,
   feedbackText: String,
@@ -60,11 +51,7 @@ const feedbackSchema = new mongoose.Schema({
   },
 });
 const Feedback = mongoose.model('Feedback', feedbackSchema);
-
-
 app.use('/certificates', express.static(path.join(__dirname, 'certificates')));
-
-
 app.post('/register', async (req, res) => {
   try {
     const newStudent = new Student(req.body.formData);
@@ -75,7 +62,6 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 // Get Stats
 app.get('/stats/:month/:year', async (req, res) => {
   const { month, year } = req.params;
@@ -95,15 +81,12 @@ app.get('/stats/:month/:year', async (req, res) => {
       completedTheCourse: { $ne: '' },
     });
     const totalStudentsThisYear = await Student.countDocuments({ admissionYear });
-
-    res.json({ registeredThisMonth, rejectedThisMonth, joinedThisMonth, totalStudentsThisYear });
+res.json({ registeredThisMonth, rejectedThisMonth, joinedThisMonth, totalStudentsThisYear });
   } catch (err) {
     console.error('❌ Error fetching stats:', err);
     res.status(500).json({ message: 'Error fetching student statistics' });
   }
 });
-
-
 app.get('/api/student-details', async (req, res) => {
   try {
     const students = await Student.find();
@@ -113,8 +96,6 @@ app.get('/api/student-details', async (req, res) => {
     res.status(500).json({ message: 'Error fetching student details' });
   }
 });
-
-
 app.get('/api/student/:id', async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
@@ -125,8 +106,6 @@ app.get('/api/student/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 app.put('/api/student/:id', async (req, res) => {
   try {
     const updatedStudent = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -137,8 +116,6 @@ app.put('/api/student/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 app.delete('/api/student/:id', async (req, res) => {
   try {
     const deletedStudent = await Student.findByIdAndDelete(req.params.id);
@@ -149,8 +126,6 @@ app.delete('/api/student/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 app.get('/api/student-search', async (req, res) => {
   const { query } = req.query;
   try {
@@ -166,8 +141,6 @@ app.get('/api/student-search', async (req, res) => {
     res.status(500).json({ message: 'Search failed' });
   }
 });
-
-// Feedback
 app.post('/api/feedback', async (req, res) => {
   try {
     const { studentId, feedbackText } = req.body;
@@ -179,24 +152,20 @@ app.post('/api/feedback', async (req, res) => {
     res.status(500).json({ message: 'Server error while saving feedback' });
   }
 });
-
 app.get('/api/download-certificate/:filename', (req, res) => {
   const filePath = path.join(__dirname, 'certificates', req.params.filename);
-  console.log('👉 Checking file path:', filePath); // 👈 Add this line
-
-  if (!fs.existsSync(filePath)) {
+  console.log('👉 Checking file path:', filePath); 
+ if (!fs.existsSync(filePath)) {
     console.error('❌ Certificate not found:', filePath);
     return res.status(404).json({ message: 'Certificate not found' });
   }
-
-  res.download(filePath, (err) => {
+res.download(filePath, (err) => {
     if (err) {
       console.error('❌ Error sending file:', err);
       res.status(500).json({ message: 'Error downloading file' });
     }
   });
 });
-
 app.get('/api/bar-chart-data', async (req, res) => {
   try {
     const currentYear = new Date().getFullYear();
@@ -218,8 +187,6 @@ app.get('/api/bar-chart-data', async (req, res) => {
     res.status(500).json({ message: 'Failed to load chart data' });
   }
 });
-
-
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
