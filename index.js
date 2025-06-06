@@ -7,10 +7,9 @@ const app = express();
 const PORT = 2000;
 app.use(cors());
 app.use(express.json());
-mongoose.connect('mongodb://localhost:27017/studentDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect("mongodb+srv://priya:priya@cluster0.aemiq.mongodb.net/studentdata?retryWrites=true&w=majority&appName=Cluster0")
+  .then(() => console.log("DB connected"))
+  .catch((err) => console.log("DB connection error:", err));
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('✅ MongoDB connected'));
